@@ -1,0 +1,12 @@
+.container {
+    color: black;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+.mb-6 {
+    margin-bottom: 6rem;
+}
+.pb-6 {
+    padding-bottom: 6rem;
+}
