@@ -31,11 +31,19 @@ function retrieveDateRepresentation(datetime_str = '') {
     // const milliseconds = dateObject.getMilliseconds();
     return `${hours}:${minutes}:${seconds}`
 }
+function checkValidComment(comment='') {
+    if (typeof comment !== 'string') return false;
+    if (comment.length === 0) return false;
+    if (/^[0-9]+$/.test(comment)) return false;
+    const words = comment.trim().split(/\s+/);
+    if (words.length < 3) return false;
+    return true;
+}
 const App = () => {
     const [consumingYoutubeLiveChat, setConsumingYoutubeLiveChat] = useState(false);
     const isInitialRender = useRef(true);
     const youtubeLiveChatListRef = useRef(null); 
-    const [videoId, setVideoId] = useState('');
+    const [videoId, setVideoId] = useState('Kg_qK8uAaEY');
     const [searchStreamDetails, setSearchStreamDetails] = useState(false);
     const [streamDetails, setStreamDetails] = useState(null);
     const commentIdAlreadyConsumed = useRef([]);
@@ -56,7 +64,7 @@ const App = () => {
             return;
         } 
         if (consumingYoutubeLiveChat === true) {
-            const socket = io('http://localhost:8000');
+            const socket = io('http://127.0.0.1:8000');
             socketConnection.current = socket;
             socket.on('connect', () => {
                 console.log('Connected to Socket.IO server');
@@ -76,7 +84,11 @@ const App = () => {
                     }
                 }
                 if (flag === false) {
-                    console.log(`Received: ${JSON.stringify(data)}`);
+                    if (checkValidComment(data.comment) === false) {
+                        console.log(`Invalid: ${JSON.stringify(data)}`);
+                        return;
+                    }
+                    console.log(`Valid: ${JSON.stringify(data)}`);
                     totalLiveChatComments.current += 1;
                     const listItem = document.createElement('li');
                     listItem.className = 'smooth-appear youtube-live-chat-list-item';
@@ -91,10 +103,6 @@ const App = () => {
                     authorNameStrong.style.color = randomColor;
                     const commentSpan = document.createElement('span');
                     commentSpan.textContent = data.comment;
-                    // commentSpan.className = 'youtube-live-chat-list-item__comment';
-                    // commentSpan.style.color = '#121212';
-                    // const feelingStrong = document.createElement('strong');
-                    // feelingStrong.textContent = data.feeling;
                     if (data.feeling === 'neutral') {
                         commentSpan.className = 'youtube-live-chat-list-item__feeling-neutral';
                         neutralLiveChatComments.current += 1;
